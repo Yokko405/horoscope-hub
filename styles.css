@@ -351,11 +351,87 @@ main {
     gap: 0.75rem;
   }
 
+.fortune-card-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+.fortune-card-icon {
+    font-size: 1.6rem;
+    filter: drop-shadow(0 0 16px rgba(255, 201, 113, 0.35));
+  }
+
+.fortune-card[data-category='love'] .fortune-card-icon {
+    color: #ff8ad4;
+  }
+
+.fortune-card[data-category='work'] .fortune-card-icon {
+    color: #8f83ff;
+  }
+
+.fortune-card[data-category='money'] .fortune-card-icon {
+    color: #7ad4a7;
+  }
+
+.fortune-card-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
 .fortune-card h5 {
     margin: 0;
     font-size: 1.05rem;
     color: var(--accent);
     letter-spacing: 0.04em;
+  }
+
+.fortune-card-score {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+.fortune-card-score meter {
+    --meter-bg: rgba(148, 191, 255, 0.25);
+    --meter-fill: rgba(255, 201, 113, 0.85);
+    appearance: none;
+    width: 96px;
+    height: 0.55rem;
+    background: var(--meter-bg);
+    border-radius: 999px;
+  }
+
+.fortune-card[data-category='love'] .fortune-card-score meter {
+    --meter-fill: rgba(255, 138, 212, 0.85);
+  }
+
+.fortune-card[data-category='work'] .fortune-card-score meter {
+    --meter-fill: rgba(143, 131, 255, 0.85);
+  }
+
+.fortune-card[data-category='money'] .fortune-card-score meter {
+    --meter-fill: rgba(122, 212, 167, 0.85);
+  }
+
+.fortune-card-score meter::-webkit-meter-bar {
+    background: var(--meter-bg);
+    border-radius: 999px;
+  }
+
+.fortune-card-score meter::-webkit-meter-optimum-value,
+.fortune-card-score meter::-webkit-meter-suboptimum-value,
+.fortune-card-score meter::-webkit-meter-even-less-good-value {
+    background: var(--meter-fill);
+    border-radius: 999px;
+  }
+
+.fortune-card-score meter::-moz-meter-bar {
+    background: var(--meter-fill);
+    border-radius: 999px;
   }
 
 .fortune-card p {
@@ -390,6 +466,30 @@ main {
 .fortune-extra dd {
     margin: 0;
     color: var(--text-muted);
+  }
+
+.fortune-status {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+.fortune-result[data-status='cached'] .fortune-status {
+    color: rgba(148, 191, 255, 0.85);
+  }
+
+.fortune-result[data-status='fresh'] .fortune-status {
+    color: rgba(255, 201, 113, 0.9);
+  }
+
+.fortune-result[data-status='cached'] .fortune-card {
+    border-color: rgba(148, 191, 255, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(148, 191, 255, 0.15);
+  }
+
+.fortune-result[data-status='fresh'] .fortune-card {
+    border-color: rgba(255, 201, 113, 0.35);
+    box-shadow: 0 12px 30px rgba(255, 201, 113, 0.12);
   }
 
 .hero-visual {
@@ -570,6 +670,16 @@ section:not(.fortune-checker) {
     transform: translateY(-6px);
     border-color: rgba(255, 201, 71, 0.6);
     box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.25);
+  }
+
+.zodiac-card.is-active {
+    transform: translateY(-6px);
+    border-color: rgba(255, 201, 71, 0.75);
+    box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.35);
+  }
+
+.zodiac-card.is-active .zodiac-name {
+    color: rgba(255, 201, 71, 0.95);
   }
 
 .zodiac-name {

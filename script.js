@@ -1,6 +1,9 @@
 const API_ENDPOINT = 'https://horoscope-api.vercel.app/api';
 const API_DEFAULT_DAY = 'today';
 const REQUEST_TIMEOUT_MS = 8000;
+const CACHE_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
+const CACHE_NAMESPACE = 'horoscope-hub:fortune';
+const LAST_SIGN_KEY = 'horoscope-hub:last-sign';
 
 const zodiacSigns = [
   {
@@ -128,6 +131,91 @@ const fallbackSuggestions = {
   },
 };
 
+function safeStorageGet(key) {
+  try {
+    return window.localStorage ? window.localStorage.getItem(key) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function safeStorageSet(key, value) {
+  try {
+    if (window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch (error) {
+    // Ignore quota/security failures
+  }
+}
+
+function safeStorageRemove(key) {
+  try {
+    if (window.localStorage) {
+      window.localStorage.removeItem(key);
+    }
+  } catch (error) {
+    // Ignore quota/security failures
+  }
+}
+
+function getCacheKey(sign) {
+  return `${CACHE_NAMESPACE}:${sign.english.toLowerCase()}:${API_DEFAULT_DAY}`;
+}
+
+function loadCachedFortune(sign) {
+  const key = getCacheKey(sign);
+  const raw = safeStorageGet(key);
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') {
+      safeStorageRemove(key);
+      return null;
+    }
+
+    const { timestamp, fortune } = parsed;
+    if (typeof timestamp !== 'number' || !fortune) {
+      safeStorageRemove(key);
+      return null;
+    }
+
+    if (Date.now() - timestamp > CACHE_TTL_MS) {
+      safeStorageRemove(key);
+      return null;
+    }
+
+    return fortune;
+  } catch (error) {
+    safeStorageRemove(key);
+    return null;
+  }
+}
+
+function saveFortuneToCache(sign, fortune) {
+  const key = getCacheKey(sign);
+  const payload = {
+    timestamp: Date.now(),
+    fortune,
+  };
+  safeStorageSet(key, JSON.stringify(payload));
+}
+
+function rememberLastSign(sign) {
+  safeStorageSet(LAST_SIGN_KEY, sign.english);
+}
+
+function restoreLastSign() {
+  const english = safeStorageGet(LAST_SIGN_KEY);
+  if (!english) {
+    return null;
+  }
+  return zodiacSigns.find((sign) => sign.english === english) ?? null;
+}
+
 function isWithinRange(month, day, sign) {
   const { start, end } = sign;
   const current = month * 100 + day;
@@ -177,6 +265,58 @@ function firstStringFromSources(sources, paths) {
     }
   }
   return '';
+}
+
+function parseScoreValue(raw) {
+  if (raw == null) {
+    return null;
+  }
+
+  let value = raw;
+
+  if (typeof value === 'string') {
+    const normalised = value.replace(/[^0-9.,-]/g, '').replace(',', '.');
+    const parsed = Number.parseFloat(normalised);
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+    value = parsed;
+  }
+
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return null;
+  }
+
+  if (value > 5) {
+    if (value <= 100) {
+      value /= 20;
+    } else {
+      value /= 100;
+    }
+  }
+
+  if (value < 0) {
+    value = 0;
+  }
+
+  if (value > 5) {
+    value = 5;
+  }
+
+  return Number(value.toFixed(2));
+}
+
+function firstScoreFromSources(sources, paths) {
+  for (const source of sources) {
+    for (const path of paths) {
+      const candidate = getValueAtPath(source, path);
+      const score = parseScoreValue(candidate);
+      if (typeof score === 'number') {
+        return score;
+      }
+    }
+  }
+  return null;
 }
 
 function createSources(payload) {
@@ -234,6 +374,12 @@ function createFallbackFortune(sign) {
     money: `${label}の堅実さが光ります。日常のルーティンを整えることで運気の底上げに。`,
     color: suggestion?.color ?? 'ミッドナイトブルー',
     action: suggestion?.action ?? '寝る前に今日の感謝を3つメモする',
+    scores: {
+      overall: null,
+      love: null,
+      work: null,
+      money: null,
+    },
   };
 }
 
@@ -315,6 +461,45 @@ function normaliseHoroscopePayload(payload, sign) {
       'metadata.date',
     ]) || new Date().toISOString();
 
+  const overallScore =
+    firstScoreFromSources(sources, [
+      'overall_score',
+      'overall.score',
+      'overall.rating',
+      'score',
+      'general_score',
+      'general.rating',
+      'general.score',
+    ]) ?? fallback.scores.overall;
+
+  const loveScore =
+    firstScoreFromSources(sources, [
+      'love_score',
+      'love.score',
+      'love.rating',
+      'romance_score',
+      'romance.rating',
+    ]) ?? fallback.scores.love;
+
+  const workScore =
+    firstScoreFromSources(sources, [
+      'work_score',
+      'work.score',
+      'work.rating',
+      'career_score',
+      'career.rating',
+    ]) ?? fallback.scores.work;
+
+  const moneyScore =
+    firstScoreFromSources(sources, [
+      'money_score',
+      'money.score',
+      'money.rating',
+      'finance_score',
+      'financial.rating',
+      'wealth.score',
+    ]) ?? fallback.scores.money;
+
   return {
     date: formatDisplayDate(dateText),
     overall,
@@ -323,6 +508,12 @@ function normaliseHoroscopePayload(payload, sign) {
     money,
     color,
     action,
+    scores: {
+      overall: overallScore,
+      love: loveScore,
+      work: workScore,
+      money: moneyScore,
+    },
   };
 }
 
@@ -378,12 +569,26 @@ function initFortuneChecker() {
   const zodiacNameNode = document.getElementById('zodiac-name');
   const zodiacRangeNode = document.getElementById('zodiac-range');
   const dateNode = document.getElementById('fortune-date');
+  const statusNode = document.getElementById('fortune-status');
   const overallNode = document.getElementById('fortune-overall');
   const loveNode = document.getElementById('fortune-love');
   const workNode = document.getElementById('fortune-work');
   const moneyNode = document.getElementById('fortune-money');
   const colorNode = document.getElementById('fortune-color');
   const actionNode = document.getElementById('fortune-action');
+  const overallScoreNode = document.getElementById('fortune-overall-score');
+  const overallScoreMeter = document.getElementById('fortune-overall-score-meter');
+  const overallScoreText = document.getElementById('fortune-overall-score-text');
+  const loveScoreNode = document.getElementById('fortune-love-score');
+  const loveScoreMeter = document.getElementById('fortune-love-score-meter');
+  const loveScoreText = document.getElementById('fortune-love-score-text');
+  const workScoreNode = document.getElementById('fortune-work-score');
+  const workScoreMeter = document.getElementById('fortune-work-score-meter');
+  const workScoreText = document.getElementById('fortune-work-score-text');
+  const moneyScoreNode = document.getElementById('fortune-money-score');
+  const moneyScoreMeter = document.getElementById('fortune-money-score-meter');
+  const moneyScoreText = document.getElementById('fortune-money-score-text');
+  const zodiacCards = Array.from(document.querySelectorAll('.zodiac-card[data-sign]'));
 
   if (
     !form ||
@@ -396,19 +601,47 @@ function initFortuneChecker() {
     !zodiacNameNode ||
     !zodiacRangeNode ||
     !dateNode ||
+    !statusNode ||
     !overallNode ||
     !loveNode ||
     !workNode ||
     !moneyNode ||
     !colorNode ||
-    !actionNode
+    !actionNode ||
+    !overallScoreNode ||
+    !overallScoreMeter ||
+    !overallScoreText ||
+    !loveScoreNode ||
+    !loveScoreMeter ||
+    !loveScoreText ||
+    !workScoreNode ||
+    !workScoreMeter ||
+    !workScoreText ||
+    !moneyScoreNode ||
+    !moneyScoreMeter ||
+    !moneyScoreText
   ) {
     return;
   }
 
   let lastSign = null;
   let lastBirth = null;
+  let activeCard = null;
+  const zodiacCardMap = new Map(
+    zodiacCards.map((card) => [card.dataset.sign, card])
+  );
   refreshButton.disabled = true;
+  setStatus('');
+
+  function setStatus(message) {
+    if (!message) {
+      statusNode.textContent = '';
+      statusNode.hidden = true;
+      return;
+    }
+    statusNode.textContent = message;
+    statusNode.hidden = false;
+  }
 
   function parseBirthdate(value) {
     const segments = value.split('-').map((segment) => Number.parseInt(segment, 10));
@@ -422,12 +655,26 @@ function initFortuneChecker() {
     return { month, day };
   }
 
+  function highlightSign(sign) {
+    const targetCard = sign ? zodiacCardMap.get(sign.english) : null;
+    if (activeCard && activeCard !== targetCard) {
+      activeCard.classList.remove('is-active');
+    }
+    if (targetCard) {
+      targetCard.classList.add('is-active');
+      activeCard = targetCard;
+    } else {
+      activeCard = null;
+    }
+  }
+
   function setLoading(isLoading) {
     loader.hidden = !isLoading;
     submitButton.disabled = isLoading;
     refreshButton.disabled = isLoading || !lastSign;
     if (isLoading) {
       resultSection.hidden = true;
+      setStatus('');
     }
   }
 
@@ -437,17 +684,32 @@ function initFortuneChecker() {
   }
 
   function showError(message) {
+    setStatus('');
     errorNode.textContent = message;
     errorNode.hidden = false;
     resultSection.hidden = true;
   }
 
   function renderSign(sign) {
+    highlightSign(sign);
     zodiacNameNode.textContent = `${sign.name} (${sign.english})`;
     zodiacRangeNode.textContent = formatRange(sign);
   }
 
-  function renderFortune(sign, fortune) {
+  function updateScoreDisplay(wrapper, meter, textNode, value) {
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      meter.value = value;
+      meter.setAttribute('value', String(value));
+      textNode.textContent = `スコア ${value.toFixed(1)} / 5`;
+      wrapper.hidden = false;
+    } else {
+      textNode.textContent = '';
+      wrapper.hidden = true;
+    }
+  }
+
+  function renderFortune(sign, fortune, options = {}) {
+    const { fromCache = false, statusMessage = '' } = options;
     renderSign(sign);
     dateNode.textContent = `今日の占い: ${fortune.date}`;
     overallNode.textContent = fortune.overall;
@@ -456,17 +718,53 @@ function initFortuneChecker() {
     moneyNode.textContent = fortune.money;
     colorNode.textContent = fortune.color;
     actionNode.textContent = fortune.action;
+    updateScoreDisplay(overallScoreNode, overallScoreMeter, overallScoreText, fortune.scores?.overall ?? null);
+    updateScoreDisplay(loveScoreNode, loveScoreMeter, loveScoreText, fortune.scores?.love ?? null);
+    updateScoreDisplay(workScoreNode, workScoreMeter, workScoreText, fortune.scores?.work ?? null);
+    updateScoreDisplay(moneyScoreNode, moneyScoreMeter, moneyScoreText, fortune.scores?.money ?? null);
+    resultSection.dataset.status = fromCache ? 'cached' : 'fresh';
+    if (statusMessage) {
+      setStatus(statusMessage);
+    } else if (fromCache) {
+      setStatus('キャッシュされた占い結果を表示中です。');
+    } else {
+      setStatus('最新の占い結果を取得しました。');
+    }
+    refreshButton.disabled = false;
+    rememberLastSign(sign);
     resultSection.hidden = false;
   }
 
-  async function handleFortuneRequest(sign) {
+  async function handleFortuneRequest(sign, options = {}) {
+    const { bypassCache = false } = options;
     hideError();
+
+    if (!bypassCache) {
+      const cachedFortune = loadCachedFortune(sign);
+      if (cachedFortune) {
+        renderFortune(sign, cachedFortune, {
+          fromCache: true,
+          statusMessage: 'キャッシュされた占い結果を表示中です。',
+        });
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const fortune = await fetchHoroscope(sign);
-      renderFortune(sign, fortune);
+      saveFortuneToCache(sign, fortune);
+      renderFortune(sign, fortune, {
+        fromCache: false,
+        statusMessage: '最新の占い結果を取得しました。',
+      });
     } catch (error) {
       const fallback = createFallbackFortune(sign);
+      const friendlyMessage =
+        error.message && error.message.startsWith('Failed to fetch')
+          ? '占いAPIへの接続に失敗しました。時間をおいて再度お試しください。'
+          : error.message || '占い結果の取得に失敗しました。時間をおいて再度お試しください。';
+      showError(friendlyMessage);
       renderFortune(sign, {
         date: formatTodayFallback(),
         overall: fallback.overall,
@@ -475,13 +773,11 @@ function initFortuneChecker() {
         money: fallback.money,
         color: fallback.color,
         action: fallback.action,
+        scores: fallback.scores,
+      }, {
+        fromCache: false,
+        statusMessage: '占いAPIから取得できなかったため、代替メッセージを表示しています。',
       });
-      const friendlyMessage =
-        error.message && error.message.startsWith('Failed to fetch')
-          ? '占いAPIへの接続に失敗しました。時間をおいて再度お試しください。'
-          : error.message || '占い結果の取得に失敗しました。時間をおいて再度お試しください。';
-      showError(friendlyMessage);
-      resultSection.hidden = false;
     } finally {
       setLoading(false);
     }
@@ -521,7 +817,7 @@ function initFortuneChecker() {
       return;
     }
     hideError();
-    handleFortuneRequest(lastSign);
+    handleFortuneRequest(lastSign, { bypassCache: true });
   });
 
   input.addEventListener('change', () => {
@@ -549,6 +845,40 @@ function initFortuneChecker() {
     renderSign(sign);
     handleFortuneRequest(sign);
   });
+
+  zodiacCards.forEach((card) => {
+    card.addEventListener('click', (event) => {
+      event.preventDefault();
+      const english = card.dataset.sign;
+      if (!english) {
+        return;
+      }
+
+      const sign = zodiacSigns.find((item) => item.english === english);
+      if (!sign) {
+        return;
+      }
+
+      lastSign = sign;
+      lastBirth = null;
+      input.value = '';
+      hideError();
+      renderSign(sign);
+      handleFortuneRequest(sign);
+      const section = document.getElementById('fortune-checker');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  const restoredSign = restoreLastSign();
+  if (restoredSign) {
+    lastSign = restoredSign;
+    hideError();
+    renderSign(restoredSign);
+    handleFortuneRequest(restoredSign);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initFortuneChecker);

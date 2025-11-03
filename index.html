@@ -85,7 +85,7 @@
               <span>占い結果を取得しています…</span>
             </div>
             <p id="fortune-error" class="fortune-error" role="alert" hidden></p>
-            <section id="fortune-result" class="fortune-result" hidden>
+            <section id="fortune-result" class="fortune-result" hidden data-status="idle">
               <header class="fortune-meta">
                 <div>
                   <h4 id="zodiac-name">&nbsp;</h4>
@@ -96,21 +96,90 @@
                   <button type="button" id="fortune-refresh">再占い</button>
                 </div>
               </header>
+              <p id="fortune-status" class="fortune-status" aria-live="polite" hidden></p>
               <div class="fortune-grid">
-                <article class="fortune-card">
-                  <h5>総合運</h5>
+                <article class="fortune-card" data-category="overall">
+                  <header class="fortune-card-header">
+                    <span class="fortune-card-icon" aria-hidden="true">🔮</span>
+                    <div class="fortune-card-title">
+                      <h5>総合運</h5>
+                      <div class="fortune-card-score" id="fortune-overall-score" hidden>
+                        <meter
+                          id="fortune-overall-score-meter"
+                          min="0"
+                          max="5"
+                          low="2"
+                          high="4"
+                          optimum="5"
+                          value="0"
+                        ></meter>
+                        <span class="fortune-card-score-text" id="fortune-overall-score-text"></span>
+                      </div>
+                    </div>
+                  </header>
                   <p id="fortune-overall">宇宙からのメッセージを準備中です。</p>
                 </article>
-                <article class="fortune-card">
-                  <h5>恋愛運</h5>
+                <article class="fortune-card" data-category="love">
+                  <header class="fortune-card-header">
+                    <span class="fortune-card-icon" aria-hidden="true">💖</span>
+                    <div class="fortune-card-title">
+                      <h5>恋愛運</h5>
+                      <div class="fortune-card-score" id="fortune-love-score" hidden>
+                        <meter
+                          id="fortune-love-score-meter"
+                          min="0"
+                          max="5"
+                          low="2"
+                          high="4"
+                          optimum="5"
+                          value="0"
+                        ></meter>
+                        <span class="fortune-card-score-text" id="fortune-love-score-text"></span>
+                      </div>
+                    </div>
+                  </header>
                   <p id="fortune-love">宇宙からのメッセージを準備中です。</p>
                 </article>
-                <article class="fortune-card">
-                  <h5>仕事運</h5>
+                <article class="fortune-card" data-category="work">
+                  <header class="fortune-card-header">
+                    <span class="fortune-card-icon" aria-hidden="true">💼</span>
+                    <div class="fortune-card-title">
+                      <h5>仕事運</h5>
+                      <div class="fortune-card-score" id="fortune-work-score" hidden>
+                        <meter
+                          id="fortune-work-score-meter"
+                          min="0"
+                          max="5"
+                          low="2"
+                          high="4"
+                          optimum="5"
+                          value="0"
+                        ></meter>
+                        <span class="fortune-card-score-text" id="fortune-work-score-text"></span>
+                      </div>
+                    </div>
+                  </header>
                   <p id="fortune-work">宇宙からのメッセージを準備中です。</p>
                 </article>
-                <article class="fortune-card">
-                  <h5>金運</h5>
+                <article class="fortune-card" data-category="money">
+                  <header class="fortune-card-header">
+                    <span class="fortune-card-icon" aria-hidden="true">💰</span>
+                    <div class="fortune-card-title">
+                      <h5>金運</h5>
+                      <div class="fortune-card-score" id="fortune-money-score" hidden>
+                        <meter
+                          id="fortune-money-score-meter"
+                          min="0"
+                          max="5"
+                          low="2"
+                          high="4"
+                          optimum="5"
+                          value="0"
+                        ></meter>
+                        <span class="fortune-card-score-text" id="fortune-money-score-text"></span>
+                      </div>
+                    </div>
+                  </header>
                   <p id="fortune-money">宇宙からのメッセージを準備中です。</p>
                 </article>
               </div>
@@ -166,84 +235,84 @@
       <section id="zodiac">
         <h2 class="section-title">12星座から選択</h2>
         <div class="zodiac-grid">
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Aries">
             <span class="zodiac-name">牡羊座</span>
             <span class="zodiac-date">3/21 - 4/19</span>
             <p>
               情熱と行動力にあふれるあなたへ。直感を信じて新しい挑戦を。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Taurus">
             <span class="zodiac-name">牡牛座</span>
             <span class="zodiac-date">4/20 - 5/20</span>
             <p>
               心地よさと安定を大切に。豊かな感性で周囲を癒やしましょう。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Gemini">
             <span class="zodiac-name">双子座</span>
             <span class="zodiac-date">5/21 - 6/21</span>
             <p>
               柔軟な発想とコミュニケーション力が魅力。新しい出会いを楽しんで。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Cancer">
             <span class="zodiac-name">蟹座</span>
             <span class="zodiac-date">6/22 - 7/22</span>
             <p>
               温かい思いやりが光る日。家族や友人との時間を大切に。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Leo">
             <span class="zodiac-name">獅子座</span>
             <span class="zodiac-date">7/23 - 8/22</span>
             <p>
               自信と輝きが周囲を惹きつけます。主役としての活躍に期待。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Virgo">
             <span class="zodiac-name">乙女座</span>
             <span class="zodiac-date">8/23 - 9/22</span>
             <p>
               丁寧さと誠実さが評価される日。細部への気配りで信頼度アップ。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Libra">
             <span class="zodiac-name">天秤座</span>
             <span class="zodiac-date">9/23 - 10/23</span>
             <p>
               バランス感覚が冴えるとき。美意識を磨き、調和の取れた選択を。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Scorpio">
             <span class="zodiac-name">蠍座</span>
             <span class="zodiac-date">10/24 - 11/22</span>
             <p>
               洞察力と集中力が鍵。大切な人との深い対話で新しい発見が。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Sagittarius">
             <span class="zodiac-name">射手座</span>
             <span class="zodiac-date">11/23 - 12/21</span>
             <p>
               自由を愛する心が冒険を呼びます。旅や学びの計画を立ててみて。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Capricorn">
             <span class="zodiac-name">山羊座</span>
             <span class="zodiac-date">12/22 - 1/19</span>
             <p>
               努力と責任感が実を結ぶ日。長期的な目標に向けて一歩前進。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Aquarius">
             <span class="zodiac-name">水瓶座</span>
             <span class="zodiac-date">1/20 - 2/18</span>
             <p>
               革新的なアイデアが舞い込む予感。仲間とビジョンを共有しよう。
             </p>
           </a>
-          <a class="zodiac-card" href="#fortune-checker">
+          <a class="zodiac-card" href="#fortune-checker" data-sign="Pisces">
             <span class="zodiac-name">魚座</span>
             <span class="zodiac-date">2/19 - 3/20</span>
             <p>
