@@ -1,0 +1,768 @@
+:root {
+    color-scheme: dark;
+    --bg: radial-gradient(circle at 20% 20%, #1a2540 0%, #080b16 60%, #04050a 100%);
+    --card-bg: rgba(16, 24, 48, 0.65);
+    --card-border: rgba(134, 159, 255, 0.25);
+    --accent: #94bfff;
+    --accent-strong: #ffc947;
+    --text-main: #f3f5ff;
+    --text-muted: #c5c9e8;
+    --shadow: 0 25px 60px rgba(8, 12, 34, 0.5);
+  }
+
+* {
+    box-sizing: border-box;
+  }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN',
+      '游ゴシック体', YuGothic, 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    overflow-x: hidden;
+  }
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(12px);
+    background: rgba(4, 6, 15, 0.65);
+    border-bottom: 1px solid rgba(148, 191, 255, 0.1);
+  }
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 5vw;
+  }
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #94bfff, #8f83ff 55%, #ffc947);
+    display: grid;
+    place-items: center;
+    font-size: 1.3rem;
+    box-shadow: 0 12px 24px rgba(148, 191, 255, 0.35);
+  }
+
+.brand h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    letter-spacing: 0.04em;
+  }
+
+nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    gap: 1.75rem;
+    font-size: 0.95rem;
+  }
+
+nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+
+nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.3rem;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(135deg, #94bfff, #ffc947);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+
+nav a:hover {
+    color: var(--text-main);
+  }
+
+nav a:hover::after {
+    transform: scaleX(1);
+  }
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+  }
+
+.hero {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-items: center;
+    gap: 3rem;
+    padding: 6rem 5vw 0;
+  }
+
+.hero-copy h2 {
+    font-size: clamp(2rem, 4vw + 1rem, 3.6rem);
+    margin-bottom: 1.5rem;
+    line-height: 1.25;
+  }
+
+.hero-copy p {
+    margin-bottom: 2rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
+  }
+
+.btn-primary {
+    background: linear-gradient(135deg, #94bfff, #8f83ff 55%, #ffc947);
+    color: #05070f;
+    box-shadow: 0 15px 35px rgba(148, 191, 255, 0.4);
+  }
+
+.btn-secondary {
+    border: 1px solid rgba(148, 191, 255, 0.35);
+    color: var(--text-main);
+    background: rgba(12, 18, 36, 0.75);
+  }
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(148, 191, 255, 0.45);
+  }
+
+.btn:focus-visible {
+    outline: 3px solid rgba(148, 191, 255, 0.55);
+    outline-offset: 3px;
+  }
+
+.fortune-checker {
+    margin: 0 auto;
+    padding: clamp(2rem, 4vw, 3rem);
+    width: min(90vw, 960px);
+    border-radius: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 1.75rem;
+  }
+
+.fortune-checker h3 {
+    margin: 0;
+    font-size: clamp(1.4rem, 1.2rem + 1vw, 2rem);
+  }
+
+.fortune-checker p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+.birth-form {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+  }
+
+.birth-form label {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+.birth-form input[type='date'] {
+    background: rgba(6, 10, 22, 0.75);
+    border: 1px solid rgba(148, 191, 255, 0.35);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    color: var(--text-main);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+.birth-form input[type='date']:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(148, 191, 255, 0.25);
+  }
+
+.birth-form button {
+    justify-self: start;
+  }
+
+.fortune-output {
+    display: grid;
+    gap: 1rem;
+  }
+
+.fortune-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+.fortune-loading-spinner {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid rgba(148, 191, 255, 0.2);
+    border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+
+@keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+@keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+.fortune-error {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 131, 131, 0.4);
+    background: rgba(255, 131, 131, 0.08);
+    color: #ff9f9f;
+  }
+
+.fortune-result {
+    border-top: 1px solid rgba(148, 191, 255, 0.2);
+    padding-top: 1.5rem;
+    display: grid;
+    gap: 1.5rem;
+    animation: fade-in 0.35s ease;
+  }
+
+.fortune-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+.fortune-meta h4 {
+    margin: 0;
+    font-size: 1.35rem;
+    color: var(--accent-strong);
+  }
+
+.fortune-meta-date {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+.fortune-meta-actions {
+    display: inline-flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+.fortune-meta button {
+    padding: 0.65rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 191, 255, 0.35);
+    background: rgba(12, 18, 36, 0.75);
+    color: var(--text-main);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+.fortune-meta button:hover,
+.fortune-meta button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px rgba(148, 191, 255, 0.28);
+    border-color: rgba(148, 191, 255, 0.6);
+    outline: none;
+  }
+
+.fortune-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+.fortune-card {
+    border-radius: 18px;
+    background: rgba(12, 18, 36, 0.8);
+    border: 1px solid rgba(148, 191, 255, 0.25);
+    padding: 1.25rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+.fortune-card-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+.fortune-card-icon {
+    font-size: 1.6rem;
+    filter: drop-shadow(0 0 16px rgba(255, 201, 113, 0.35));
+  }
+
+.fortune-card[data-category='love'] .fortune-card-icon {
+    color: #ff8ad4;
+  }
+
+.fortune-card[data-category='work'] .fortune-card-icon {
+    color: #8f83ff;
+  }
+
+.fortune-card[data-category='money'] .fortune-card-icon {
+    color: #7ad4a7;
+  }
+
+.fortune-card-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+.fortune-card h5 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+.fortune-card-score {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+.fortune-card-score meter {
+    --meter-bg: rgba(148, 191, 255, 0.25);
+    --meter-fill: rgba(255, 201, 113, 0.85);
+    appearance: none;
+    width: 96px;
+    height: 0.55rem;
+    background: var(--meter-bg);
+    border-radius: 999px;
+  }
+
+.fortune-card[data-category='love'] .fortune-card-score meter {
+    --meter-fill: rgba(255, 138, 212, 0.85);
+  }
+
+.fortune-card[data-category='work'] .fortune-card-score meter {
+    --meter-fill: rgba(143, 131, 255, 0.85);
+  }
+
+.fortune-card[data-category='money'] .fortune-card-score meter {
+    --meter-fill: rgba(122, 212, 167, 0.85);
+  }
+
+.fortune-card-score meter::-webkit-meter-bar {
+    background: var(--meter-bg);
+    border-radius: 999px;
+  }
+
+.fortune-card-score meter::-webkit-meter-optimum-value,
+.fortune-card-score meter::-webkit-meter-suboptimum-value,
+.fortune-card-score meter::-webkit-meter-even-less-good-value {
+    background: var(--meter-fill);
+    border-radius: 999px;
+  }
+
+.fortune-card-score meter::-moz-meter-bar {
+    background: var(--meter-fill);
+    border-radius: 999px;
+  }
+
+.fortune-card p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+.fortune-extras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+.fortune-extra {
+    flex: 1 1 180px;
+    border-radius: 16px;
+    background: rgba(12, 18, 36, 0.6);
+    border: 1px solid rgba(148, 191, 255, 0.25);
+    padding: 1rem 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+.fortune-extra dt {
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+
+.fortune-extra dd {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+.fortune-status {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+.fortune-result[data-status='cached'] .fortune-status {
+    color: rgba(148, 191, 255, 0.85);
+  }
+
+.fortune-result[data-status='fresh'] .fortune-status {
+    color: rgba(255, 201, 113, 0.9);
+  }
+
+.fortune-result[data-status='cached'] .fortune-card {
+    border-color: rgba(148, 191, 255, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(148, 191, 255, 0.15);
+  }
+
+.fortune-result[data-status='fresh'] .fortune-card {
+    border-color: rgba(255, 201, 113, 0.35);
+    box-shadow: 0 12px 30px rgba(255, 201, 113, 0.12);
+  }
+
+.hero-visual {
+    position: relative;
+    padding: 2.5rem;
+    border-radius: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+.hero-visual::before,
+.hero-visual::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.65;
+    z-index: -1;
+  }
+
+.hero-visual::before {
+    width: 220px;
+    height: 220px;
+    background: #8f83ff;
+    top: -60px;
+    right: -40px;
+  }
+
+.hero-visual::after {
+    width: 280px;
+    height: 280px;
+    background: #ffc947;
+    bottom: -90px;
+    left: -50px;
+  }
+
+.orbital-map {
+    position: relative;
+    width: min(100%, 320px);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, rgba(148, 191, 255, 0.4),
+        rgba(12, 18, 36, 0.1) 45%, rgba(12, 18, 36, 0.6) 80%);
+    border: 1px solid rgba(148, 191, 255, 0.4);
+    box-shadow: 0 0 25px rgba(148, 191, 255, 0.3);
+  }
+
+.orbital-map .planet {
+    position: absolute;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: linear-gradient(140deg, rgba(148, 191, 255, 0.9),
+        rgba(136, 120, 255, 0.9));
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #05070f;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 10px 24px rgba(148, 191, 255, 0.35);
+  }
+
+.planet.sun {
+    top: 50%;
+    left: 50%;
+    width: 96px;
+    height: 96px;
+    background: linear-gradient(140deg, #ffc947, #ff9b60);
+    color: #120511;
+  }
+
+.planet-1 {
+    top: 14%;
+    left: 74%;
+  }
+
+.planet-2 {
+    top: 82%;
+    left: 32%;
+  }
+
+.planet-3 {
+    top: 32%;
+    left: 22%;
+  }
+
+.tagline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(12, 18, 36, 0.75);
+    border: 1px solid rgba(148, 191, 255, 0.35);
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+
+section:not(.fortune-checker) {
+    padding: 0 5vw;
+  }
+
+.section-title {
+    font-size: clamp(1.8rem, 3vw + 1rem, 2.8rem);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+.feature-card {
+    padding: 2rem;
+    border-radius: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+.feature-card h3 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+.feature-card p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+.feature-icon {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: rgba(148, 191, 255, 0.18);
+    color: var(--accent);
+    font-size: 1.5rem;
+  }
+
+.zodiac-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+.zodiac-card {
+    padding: 1.4rem 1.2rem;
+    border-radius: 18px;
+    background: rgba(12, 18, 36, 0.8);
+    border: 1px solid rgba(148, 191, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
+
+.zodiac-card:hover,
+.zodiac-card:focus-visible {
+    transform: translateY(-6px);
+    border-color: rgba(255, 201, 71, 0.6);
+    box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.25);
+  }
+
+.zodiac-card.is-active {
+    transform: translateY(-6px);
+    border-color: rgba(255, 201, 71, 0.75);
+    box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.35);
+  }
+
+.zodiac-card.is-active .zodiac-name {
+    color: rgba(255, 201, 71, 0.95);
+  }
+
+.zodiac-name {
+    font-weight: 600;
+  }
+
+.zodiac-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+.cta {
+    padding: 4rem 5vw 5rem;
+  }
+
+.cta-card {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 3.5rem 3rem;
+    background: linear-gradient(140deg, rgba(12, 18, 36, 0.85),
+        rgba(148, 191, 255, 0.22));
+    border-radius: 28px;
+    border: 1px solid rgba(148, 191, 255, 0.45);
+    box-shadow: var(--shadow);
+    text-align: center;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+.cta-card p {
+    color: var(--text-muted);
+    margin: 0 auto;
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+footer {
+    text-align: center;
+    padding: 2rem 0 3rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+@media (max-width: 720px) {
+    .hero {
+      padding-top: 4.5rem;
+    }
+
+    .nav-container {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    nav ul {
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .fortune-checker {
+      width: min(94vw, 960px);
+      padding: 2rem;
+    }
+
+    .fortune-meta {
+      align-items: flex-start;
+    }
+
+    .fortune-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-card {
+      padding: 2.75rem 2rem;
+    }
+  }
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
