@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Horoscope Hub | 星占いアプリ</title>
+    <meta
+      name="description"
+      content="星占いアプリ Horoscope Hub のトップページ。今日の運勢をチェックし、宇宙からのインスピレーションを受け取りましょう。"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: radial-gradient(circle at 20% 20%, #1a2540 0%, #080b16 60%, #04050a 100%);
+        --card-bg: rgba(16, 24, 48, 0.65);
+        --card-border: rgba(134, 159, 255, 0.25);
+        --accent: #94bfff;
+        --accent-strong: #ffc947;
+        --text-main: #f3f5ff;
+        --text-muted: #c5c9e8;
+        --shadow: 0 25px 60px rgba(8, 12, 34, 0.5);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN',
+          '游ゴシック体', YuGothic, 'Noto Sans JP', sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        overflow-x: hidden;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(12px);
+        background: rgba(4, 6, 15, 0.65);
+        border-bottom: 1px solid rgba(148, 191, 255, 0.1);
+      }
+
+      .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 5vw;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .brand-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #94bfff, #8f83ff 55%, #ffc947);
+        display: grid;
+        place-items: center;
+        font-size: 1.3rem;
+        box-shadow: 0 12px 24px rgba(148, 191, 255, 0.35);
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 1.2rem;
+        letter-spacing: 0.04em;
+      }
+
+      nav ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        gap: 1.75rem;
+        font-size: 0.95rem;
+      }
+
+      nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        position: relative;
+        transition: color 0.2s ease;
+      }
+
+      nav a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -0.3rem;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(135deg, #94bfff, #ffc947);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.25s ease;
+      }
+
+      nav a:hover {
+        color: var(--text-main);
+      }
+
+      nav a:hover::after {
+        transform: scaleX(1);
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+        gap: 6rem;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        align-items: center;
+        gap: 3rem;
+        padding: 6rem 5vw 0;
+      }
+
+      .hero-copy h2 {
+        font-size: clamp(2rem, 4vw + 1rem, 3.6rem);
+        margin-bottom: 1.5rem;
+        line-height: 1.25;
+      }
+
+      .hero-copy p {
+        margin-bottom: 2rem;
+        color: var(--text-muted);
+        line-height: 1.75;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #94bfff, #8f83ff 55%, #ffc947);
+        color: #05070f;
+        box-shadow: 0 15px 35px rgba(148, 191, 255, 0.4);
+      }
+
+      .btn-secondary {
+        border: 1px solid rgba(148, 191, 255, 0.35);
+        color: var(--text-main);
+        background: rgba(12, 18, 36, 0.75);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 40px rgba(148, 191, 255, 0.45);
+      }
+
+      .hero-visual {
+        position: relative;
+        padding: 2.5rem;
+        border-radius: 24px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      .hero-visual::before,
+      .hero-visual::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.65;
+        z-index: -1;
+      }
+
+      .hero-visual::before {
+        width: 220px;
+        height: 220px;
+        background: #8f83ff;
+        top: -60px;
+        right: -40px;
+      }
+
+      .hero-visual::after {
+        width: 280px;
+        height: 280px;
+        background: #ffc947;
+        bottom: -90px;
+        left: -50px;
+      }
+
+      .orbital-map {
+        position: relative;
+        width: min(100%, 320px);
+        aspect-ratio: 1 / 1;
+        margin: 0 auto;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 50%, rgba(148, 191, 255, 0.4),
+            rgba(12, 18, 36, 0.1) 45%, rgba(12, 18, 36, 0.6) 80%);
+        border: 1px solid rgba(148, 191, 255, 0.4);
+        box-shadow: 0 0 25px rgba(148, 191, 255, 0.3);
+      }
+
+      .orbital-map .planet {
+        position: absolute;
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        background: linear-gradient(140deg, rgba(148, 191, 255, 0.9),
+            rgba(136, 120, 255, 0.9));
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: #05070f;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 10px 24px rgba(148, 191, 255, 0.35);
+      }
+
+      .planet.sun {
+        top: 50%;
+        left: 50%;
+        width: 96px;
+        height: 96px;
+        background: linear-gradient(140deg, #ffc947, #ff9b60);
+        color: #120511;
+      }
+
+      .planet-1 {
+        top: 14%;
+        left: 74%;
+      }
+
+      .planet-2 {
+        top: 82%;
+        left: 32%;
+      }
+
+      .planet-3 {
+        top: 32%;
+        left: 22%;
+      }
+
+      .tagline {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(12, 18, 36, 0.75);
+        border: 1px solid rgba(148, 191, 255, 0.35);
+        padding: 0.5rem 0.95rem;
+        border-radius: 999px;
+        color: var(--accent);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+      }
+
+      section {
+        padding: 0 5vw;
+      }
+
+      .section-title {
+        font-size: clamp(1.8rem, 3vw + 1rem, 2.8rem);
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .feature-card {
+        padding: 2rem;
+        border-radius: 20px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .feature-card h3 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+
+      .feature-card p {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .feature-icon {
+        width: 54px;
+        height: 54px;
+        display: grid;
+        place-items: center;
+        border-radius: 16px;
+        background: rgba(148, 191, 255, 0.18);
+        color: var(--accent);
+        font-size: 1.5rem;
+      }
+
+      .zodiac-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+      }
+
+      .zodiac-card {
+        padding: 1.4rem 1.2rem;
+        border-radius: 18px;
+        background: rgba(12, 18, 36, 0.8);
+        border: 1px solid rgba(148, 191, 255, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        transition: transform 0.25s ease, border-color 0.25s ease;
+      }
+
+      .zodiac-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 201, 71, 0.6);
+      }
+
+      .zodiac-name {
+        font-weight: 600;
+      }
+
+      .zodiac-date {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .cta {
+        padding: 4rem 5vw 5rem;
+      }
+
+      .cta-card {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 3.5rem 3rem;
+        background: linear-gradient(140deg, rgba(12, 18, 36, 0.85),
+            rgba(148, 191, 255, 0.22));
+        border-radius: 28px;
+        border: 1px solid rgba(148, 191, 255, 0.45);
+        box-shadow: var(--shadow);
+        text-align: center;
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .cta-card p {
+        color: var(--text-muted);
+        margin: 0 auto;
+        max-width: 520px;
+        line-height: 1.7;
+      }
+
+      footer {
+        text-align: center;
+        padding: 2rem 0 3rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 720px) {
+        .hero {
+          padding-top: 4.5rem;
+        }
+
+        .nav-container {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        nav ul {
+          gap: 1rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .cta-card {
+          padding: 2.75rem 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="nav-container">
+        <a href="#top" class="brand">
+          <span class="brand-icon">☄️</span>
+          <h1>Horoscope Hub</h1>
+        </a>
+        <nav>
+          <ul>
+            <li><a href="#features">機能</a></li>
+            <li><a href="#zodiac">12星座</a></li>
+            <li><a href="#cta">いますぐ占う</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="top" class="hero">
+        <div class="hero-copy">
+          <span class="tagline">宇宙からのメッセージを、あなたへ</span>
+          <h2>今日の運勢をワンタップで。<br />星が導く毎日のヒント。</h2>
+          <p>
+            Horoscope Hub は、生年月日と星座からあなたの今日の運勢を瞬時に分析。
+            総合運はもちろん、恋愛・仕事・金運、そしてラッキーカラーやラッキーアクションまで、
+            あなたを前向きにしてくれるメッセージをお届けします。
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#cta">今日の占いをチェック</a>
+            <a class="btn btn-secondary" href="#features">機能一覧を見る</a>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orbital-map">
+            <span class="planet sun">SOL</span>
+            <span class="planet planet-1">LUNA</span>
+            <span class="planet planet-2">VEN</span>
+            <span class="planet planet-3">MERC</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <h2 class="section-title">Horoscope Hub が選ばれる理由</h2>
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">🌓</div>
+            <h3>星座の自動判定</h3>
+            <p>
+              生年月日を入力するだけで、該当する星座を自動判定。占い初心者でも迷わずスタートできます。
+            </p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🔮</div>
+            <h3>4つの運勢を一目で</h3>
+            <p>
+              総合・恋愛・仕事・金運の評価をまとめて表示。毎日の行動のヒントとしてご活用ください。
+            </p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>ラッキーカラー＆アクション</h3>
+            <p>
+              今日のラッキーカラーとアクションを提案。ファッションや行動に取り入れて運気アップ！
+            </p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🛰️</div>
+            <h3>APIで最新情報を取得</h3>
+            <p>
+              外部の占いAPIと連携し、常に更新された運勢データを表示します。アップデートも自動で安心。
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="zodiac">
+        <h2 class="section-title">12星座から選択</h2>
+        <div class="zodiac-grid">
+          <article class="zodiac-card">
+            <span class="zodiac-name">牡羊座</span>
+            <span class="zodiac-date">3/21 - 4/19</span>
+            <p>
+              情熱と行動力にあふれるあなたへ。直感を信じて新しい挑戦を。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">牡牛座</span>
+            <span class="zodiac-date">4/20 - 5/20</span>
+            <p>
+              心地よさと安定を大切に。豊かな感性で周囲を癒やしましょう。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">双子座</span>
+            <span class="zodiac-date">5/21 - 6/21</span>
+            <p>
+              柔軟な発想とコミュニケーション力が魅力。新しい出会いを楽しんで。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">蟹座</span>
+            <span class="zodiac-date">6/22 - 7/22</span>
+            <p>
+              温かい思いやりが光る日。家族や友人との時間を大切に。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">獅子座</span>
+            <span class="zodiac-date">7/23 - 8/22</span>
+            <p>
+              自信と輝きが周囲を惹きつけます。主役としての活躍に期待。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">乙女座</span>
+            <span class="zodiac-date">8/23 - 9/22</span>
+            <p>
+              丁寧さと誠実さが評価される日。細部への気配りで信頼度アップ。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">天秤座</span>
+            <span class="zodiac-date">9/23 - 10/23</span>
+            <p>
+              バランス感覚が冴えるとき。美意識を磨き、調和の取れた選択を。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">蠍座</span>
+            <span class="zodiac-date">10/24 - 11/22</span>
+            <p>
+              洞察力と集中力が鍵。大切な人との深い対話で新しい発見が。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">射手座</span>
+            <span class="zodiac-date">11/23 - 12/21</span>
+            <p>
+              自由を愛する心が冒険を呼びます。旅や学びの計画を立ててみて。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">山羊座</span>
+            <span class="zodiac-date">12/22 - 1/19</span>
+            <p>
+              努力と責任感が実を結ぶ日。長期的な目標に向けて一歩前進。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">水瓶座</span>
+            <span class="zodiac-date">1/20 - 2/18</span>
+            <p>
+              革新的なアイデアが舞い込む予感。仲間とビジョンを共有しよう。
+            </p>
+          </article>
+          <article class="zodiac-card">
+            <span class="zodiac-name">魚座</span>
+            <span class="zodiac-date">2/19 - 3/20</span>
+            <p>
+              感受性が高まる日。アートや音楽で心を豊かに満たしましょう。
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="cta" class="cta">
+        <div class="cta-card">
+          <h2>未来の自分にワクワクする準備はできましたか？</h2>
+          <p>
+            Horoscope Hub は、あなたの毎日をサポートする星占いのコンパニオンです。
+            ログインしてパーソナライズされた占いを受け取ったり、友達と占いをシェアしたりと、
+            さまざまな楽しみ方が可能です。
+          </p>
+          <div class="hero-actions" style="justify-content: center">
+            <a class="btn btn-primary" href="#">無料ではじめる</a>
+            <a class="btn btn-secondary" href="#">アプリの詳細を見る</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      © 2024 Horoscope Hub. All rights reserved.
+    </footer>
+  </body>
+</html>
