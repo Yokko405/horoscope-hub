@@ -29,3 +29,29 @@
    ```bash
    git clone https://github.com/yourname/horoscope-app.git
    cd horoscope-app
+   ```
+2. 依存パッケージをインストール（バックエンドを利用する場合）
+   ```bash
+   npm install
+   ```
+3. ローカルサーバーを起動
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## ☁️ GitHub Pages でトップページを公開する
+作成した `index.html` を GitHub に反映させて公開する手順です。GitHub Pages を利用すると、リポジトリの内容をそのまま Web 上にホスティングできます。
+
+1. リポジトリにファイルをコミットして push する
+   ```bash
+   git add index.html README.md
+   git commit -m "Add horoscope landing page"
+   git push origin main
+   ```
+2. GitHub のリポジトリ設定画面で **Settings → Pages** を開く
+3. 「Branch」で公開対象のブランチ（例: `main`）とディレクトリ（`/root` もしくは `/docs`）を指定
+4. 保存すると数分で `https://<ユーザー名>.github.io/<リポジトリ名>/` からページが閲覧できるようになります
+
+ブランチを分けて開発したい場合は、GitHub Actions などで自動デプロイのワークフローを追加することも可能です。
